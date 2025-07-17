@@ -1,5 +1,5 @@
 from textnode import TextNode, TextType
-
+import re
 #Nested inline elements not supported (such as bold text within italic)* *-for now
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -29,3 +29,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                     # Odd index is delimited text
                     new_node.append(TextNode(split_nodes[i], text_type))
     return new_node
+
+def extract_markdown_images(text):
+    result = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return result
+
+def extract_markdown_links(text):
+    result = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return result

@@ -33,7 +33,7 @@ class TestLeafNode(unittest.TestCase):
     def test_leafnode_no_value_raises(self):
         with self.assertRaises(ValueError):
             node = LeafNode("p", None)
-            node.to_html() 
+            node.to_html()
 
 class TestParentNode(unittest.TestCase):
     def test_to_html_with_children(self):
@@ -57,3 +57,4 @@ class TestParentNode(unittest.TestCase):
         with self.assertRaises(ValueError):
             node = ParentNode("div", None)
             node.to_html()
+

@@ -1,3 +1,4 @@
+from textnode import TextType, TextNode
 class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag #tag name
@@ -14,48 +15,40 @@ class HTMLNode():
             for key, value in self.props.items():
                 return_string += f" {key}=\"{value}\""
         return return_string
+    
     def __repr__(self):
-        return f"Tag:{self.tag} \nValue:{self.value} \nChildren:{self.children} \nProps:{self.props_to_html()}"
+        return f"HTMLNode({self.tag}, Value:{self.value}, Children:{self.children}, {self.props_to_html()}"
+    
+
 
 class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
-        super().__init__(tag=tag, value=value, children=None, props=props)
+        super().__init__(tag, value, None, props)
     
     def to_html(self):
         if self.value is None:
-            raise ValueError("LeafNode requires a value")
+            raise ValueError("invalid HTML: no value")
         if self.tag is None:
-            return f"{self.value}"
-        if self.props is None:
-            return f"<{self.tag}>{self.value}</{self.tag}>"
-            
-        else:
-            props_string = ""
-            props_string = " ".join(f'{key}="{value}"' for key, value in self.props.items())
-            if props_string:
-                opening_tag = f"<{self.tag} {props_string}>"
-            else:
-                opening_tag = f"<{self.tag}>"
-            return f"{opening_tag}{self.value}</{self.tag}>"
+            return self.value
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+    def __repr__(self):
+        return f"LeafNode({self.tag}, Value: {self.value}, {self.props})"
         
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
-        super().__init__(tag=tag, value=None, children=children, props=props)
+        super().__init__(tag, None, children, props)
 
     def to_html(self):
         if self.tag is None:
-            raise ValueError("Parent Node requires a tag")
+            raise ValueError("invalid HTML: no tag")
         if self.children is None:
-            raise ValueError("Parent Node requires child objects")
-        else:
-            result_string = ""
-            for node in self.children:
-                result_string += node.to_html()
-            if self.props is None:    
-                return f"<{self.tag}>{result_string}</{self.tag}>"
-            else:
-                opening_tag = f"<{self.tag}{self.props_to_html()}>"
-                return f"{opening_tag}{result_string}</{self.tag}>"
-            
-
+            raise ValueError("invalid HTML: no children")
+        result_string = ""
+        for node in self.children:
+            result_string += node.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{result_string}</{self.tag}"
+    
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
             

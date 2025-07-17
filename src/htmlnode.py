@@ -1,4 +1,3 @@
-from textnode import TextType, TextNode
 class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag #tag name
@@ -7,7 +6,7 @@ class HTMLNode():
         self.props = props #key value pairs for attributes and values
 
     def to_html(self):
-        raise NotImplementedError
+        raise NotImplementedError("to_html method not implemented")
     
     def props_to_html(self):
         return_string = ""
@@ -44,10 +43,10 @@ class ParentNode(HTMLNode):
             raise ValueError("invalid HTML: no tag")
         if self.children is None:
             raise ValueError("invalid HTML: no children")
-        result_string = ""
-        for node in self.children:
-            result_string += node.to_html()
-        return f"<{self.tag}{self.props_to_html()}>{result_string}</{self.tag}"
+        children_html = ""
+        for child in self.children:
+            children_html += child.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
     
     def __repr__(self):
         return f"ParentNode({self.tag}, children: {self.children}, {self.props})"

@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType, text_node_to_html_node
-from htmlnode import LeafNode
+from markdown_to_textnode import split_nodes_delimiter
 
 class TestTextNode(unittest.TestCase):
 	def test_eq(self):
@@ -72,6 +72,80 @@ class TestTextNodetoHTMLNode(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			html_node = text_node_to_html_node(node)
 
+class TestInlineMarkdown(unittest.TestCase):
+	def test_delim_code(self):
+		node = TextNode("This is text with a `code block` word", TextType.TEXT)
+		new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+		self.assertListEqual(
+			[
+				TextNode("This is text with a ", TextType.TEXT),
+				TextNode("code block", TextType.CODE),
+				TextNode(" word", TextType.TEXT)
+			], 
+			new_nodes,
+		)	
 
+	def test_delim_bold(self):
+		node = TextNode("This is text with a **bold statement** word", TextType.TEXT)
+		new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+		self.assertListEqual(
+			[
+				TextNode("This is text with a ", TextType.TEXT),
+				TextNode("bold statement", TextType.BOLD),
+				TextNode(" word", TextType.TEXT)
+			], 
+			new_nodes,
+		)
+
+	def test_delim_italic(self):
+		node = TextNode("This is text with a _italic statement_ word", TextType.TEXT)
+		new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
+		self.assertListEqual(
+			[
+				TextNode("This is text with a ", TextType.TEXT),
+				TextNode("italic statement", TextType.ITALIC),
+				TextNode(" word", TextType.TEXT)
+			], 
+			new_nodes,
+		)
+
+	def test_delim_bold_multiword(self):
+		node = TextNode("This is a text with **Bold1 text** and **Bold2 text** as well", TextType.TEXT)
+		new_nodes = split_nodes_delimiter([node], "**",TextType.BOLD)
+		self.assertListEqual(
+			[
+				TextNode("This is a text with ", TextType.TEXT),
+				TextNode("Bold1 text", TextType.BOLD),
+				TextNode(" and ", TextType.TEXT),
+				TextNode("Bold2 text",TextType.BOLD),
+				TextNode(" as well", TextType.TEXT),
+			],
+			new_nodes,
+		)
+	
+	def test_delim_bold_and_italic(self):
+		node = TextNode("**bold** and _italic_", TextType.TEXT)
+		new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+		new_nodes = split_nodes_delimiter(new_nodes, "_", TextType.ITALIC)
+		self.assertListEqual(
+			[
+				TextNode("bold", TextType.BOLD),
+				TextNode(" and ", TextType.TEXT),
+				TextNode("italic", TextType.ITALIC),
+			],
+			new_nodes,
+		)
+	
+	def test_no_delim(self):
+		node = TextNode("This is text with no delimiters", TextType.TEXT)
+		new_node = split_nodes_delimiter([node], "**",TextType.BOLD)
+		self.assertEqual(new_node[0],TextNode("This is text with no delimiters", TextType.TEXT))
+
+	def test_invalid_delim_raises(self):
+		node = TextNode("This is a text with ``code block missing",TextType.TEXT)
+		with self.assertRaises(Exception):
+			new_node = split_nodes_delimiter([node],"``",TextType.CODE)
+
+		
 if __name__ == "__main__":
 	unittest.main()

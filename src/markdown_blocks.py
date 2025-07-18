@@ -62,7 +62,6 @@ def markdown_to_html_node(markdown):
                 pre_node = ParentNode("pre",[code_node])
                 blocks_html_nodes.append(pre_node)
             case BlockType.QUOTE:
-                block = block.replace('\n',' ')
                 lines = block.split("\n")
                 stripped_lines = [line.lstrip("> ").rstrip() for line in lines]
                 quote_text = "\n".join(stripped_lines).strip()
@@ -70,7 +69,6 @@ def markdown_to_html_node(markdown):
                 blocks_html_nodes.append(block_node)
 
             case BlockType.UNORDERED_LIST:
-                block = block.replace('\n',' ')
                 lines = block.split("\n")
                 li_nodes = []
                 for line in lines:
@@ -82,7 +80,6 @@ def markdown_to_html_node(markdown):
                 block_node = ParentNode("ul", li_nodes)
                 blocks_html_nodes.append(block_node)
             case BlockType.ORDERED_LIST:
-                block = block.replace('\n',' ')
                 lines = block.split("\n")
                 ol_nodes = []
                 for line in lines:
@@ -100,7 +97,7 @@ def markdown_to_html_node(markdown):
                     ol_node = ParentNode("li", text_to_children(item_text))
                     ol_nodes.append(ol_node)
 
-                block_node = HTMLNode("ol", ol_nodes)
+                block_node = ParentNode("ol", ol_nodes)
                 blocks_html_nodes.append(block_node)
 
     # we parent all of this under a single parent HTML node with the corresponding block type

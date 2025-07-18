@@ -2,6 +2,19 @@ from textnode import TextNode, TextType
 import re
 #Nested inline elements not supported (such as bold text within italic)* *-for now
 
+def text_to_textnodes(text_string):
+    #takes raw input string and converts to markdown
+    bold_delim = "**"
+    italic_delim = "_"
+    code_delim = "`"
+    nodes = [TextNode(text_string, TextType.TEXT)]
+    nodes = (split_nodes_delimiter(nodes,bold_delim,TextType.BOLD))
+    nodes = (split_nodes_delimiter(nodes,italic_delim,TextType.ITALIC))
+    nodes = (split_nodes_delimiter(nodes, code_delim, TextType.CODE))
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
 # old nodes in this case are nodes with compound text types that have to split up
 # this function will split up the old nodes and return a new node with all the text types split up
@@ -30,14 +43,6 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                     new_nodes.append(TextNode(split_nodes[i], text_type))
     return new_nodes
 
-def extract_markdown_images(text):
-    result = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
-    return result
-
-def extract_markdown_links(text):
-    result = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
-    return result
-
 def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
@@ -62,7 +67,6 @@ def split_nodes_image(old_nodes):
             new_nodes.append(TextNode(current_text,TextType.TEXT))          
     return new_nodes
 
-
 def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
@@ -86,3 +90,13 @@ def split_nodes_link(old_nodes):
         if current_text != "":
             new_nodes.append(TextNode(current_text,TextType.TEXT))          
     return new_nodes
+
+        
+def extract_markdown_images(text):
+    result = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return result
+
+def extract_markdown_links(text):
+    result = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return result
+

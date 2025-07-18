@@ -3,7 +3,7 @@ import re
 #Nested inline elements not supported (such as bold text within italic)* *-for now
 
 def text_to_textnodes(text_string):
-    #takes raw input string and converts to markdown
+    #takes markdown and returns a list of TextNodes
     bold_delim = "**"
     italic_delim = "_"
     code_delim = "`"

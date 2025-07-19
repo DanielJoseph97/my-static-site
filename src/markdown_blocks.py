@@ -2,6 +2,7 @@ from enum import Enum
 from htmlnode import *
 from inline_markdown import text_to_textnodes
 from textnode import text_node_to_html_node
+
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
     HEADING = "heading"
@@ -37,7 +38,7 @@ def block_to_block_type(block):
 
 def markdown_to_html_node(markdown): 
     blocks = markdown_to_blocks(markdown)
-    # step 1 markdown to markdown blocks
+    # markdown doc stripped to markdown blocks
     blocks_html_nodes = []
     for block in blocks:
         # for each block, determine type of block with block type function
@@ -47,6 +48,7 @@ def markdown_to_html_node(markdown):
                 block_single_line = block.replace('\n',' ')
                 block_node = ParentNode("p",text_to_children(block_single_line))
                 blocks_html_nodes.append(block_node)
+
             case BlockType.HEADING:
                 block = block.replace('\n',' ')
                 h_count = 0
@@ -55,12 +57,14 @@ def markdown_to_html_node(markdown):
                 heading_text = block[h_count:].strip()
                 block_node = ParentNode(f"h{h_count}",text_to_children(heading_text))
                 blocks_html_nodes.append(block_node)
+
             case BlockType.CODE:
                 
                 code_text = extract_code_from_text(block)
                 code_node = LeafNode("code",code_text)
                 pre_node = ParentNode("pre",[code_node])
                 blocks_html_nodes.append(pre_node)
+
             case BlockType.QUOTE:
                 lines = block.split("\n")
                 stripped_lines = [line.lstrip("> ").rstrip() for line in lines]
@@ -79,6 +83,7 @@ def markdown_to_html_node(markdown):
                         li_nodes.append(li_node)
                 block_node = ParentNode("ul", li_nodes)
                 blocks_html_nodes.append(block_node)
+
             case BlockType.ORDERED_LIST:
                 lines = block.split("\n")
                 ol_nodes = []
@@ -100,13 +105,12 @@ def markdown_to_html_node(markdown):
                 block_node = ParentNode("ol", ol_nodes)
                 blocks_html_nodes.append(block_node)
 
-    # we parent all of this under a single parent HTML node with the corresponding block type
+    # Parent all child nodes under single parent with corresponding block type
     parent_block = ParentNode("div", blocks_html_nodes)
     return parent_block
         
 def text_to_children(text):
     # Take a text (block) and return HTML nodes (inline markdown)
-
     block_text_nodes = text_to_textnodes(text) #output is list of TextNodes
     block_html_nodes = []
     for nodes in block_text_nodes:
@@ -114,6 +118,7 @@ def text_to_children(text):
     return block_html_nodes
 
 def extract_code_from_text(text):
+    #removes ``` from code block
     lines = text.split("\n")
     code_lines = lines[1:-1]
     code_text = "\n".join(code_lines) + "\n"

@@ -16,7 +16,7 @@ def text_to_textnodes(text_string):
     return nodes
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
-# old nodes in this case are nodes with compound text types that have to split up
+# old nodes are nodes with compound Text types that have to be split up
 # this function will split up the old nodes and return a new node with all the text types split up
     new_nodes = []
     for old_node in old_nodes:

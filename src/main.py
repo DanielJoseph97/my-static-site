@@ -3,12 +3,11 @@ import os
 import shutil
 from markdown_blocks import markdown_to_html_node
 from inline_markdown import extract_title
+
 def main():
 	source_dir = "static/"
 	dest_dir = "public/"
 	
-	#Step 1 - delete all files in destination directory
-	# check if path exists, if not create it
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
 		os.makedirs(dest_dir)
@@ -16,13 +15,10 @@ def main():
 		os.makedirs(dest_dir)
 	
 	copy_files(source_dir, dest_dir)
-
-	generate_page("content/index.md","template.html","public/index.html")
+	generate_pages_recursive("content/","template.html","public/")
 	
 
 def copy_files(source_dir, dest_dir):
-	
-	# Step 2 - copying files to the directory
 	dir_list = os.listdir(source_dir)
 	for item in dir_list:
 		current_path = os.path.join(source_dir,item)
@@ -68,4 +64,16 @@ def generate_page(from_path, template_path, dest_path):
 	with open(dest_path,"w") as dest_file:
 		dest_file.write(template_content)
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+	dir_list = os.listdir(dir_path_content)
+	for item in dir_list:
+		current_path = os.path.join(dir_path_content,item)
+		dest_path = os.path.join(dest_dir_path,item)
+		if os.path.isdir(current_path):
+			if os.path.exists(dest_path) == False:
+				os.makedirs(dest_path)
+			generate_pages_recursive(current_path,template_path, dest_path)
+		if os.path.isfile(current_path) and item.endswith(".md"):
+			dest_path = dest_path.replace(".md",".html")
+			generate_page(current_path, template_path, dest_path)
 main()
